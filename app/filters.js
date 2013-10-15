@@ -1,75 +1,180 @@
-/**
- * Project Touch
- *
- * @date: 6/18/13
- */
+/* Microsoft Video Editor
+ * @author: T.M.P. Kleist / Code D'azur <thierry@codedazur.nl>
+ * ============================================================================== */
 
-/*global define, window, document, $, requirejs, require  */
+/*global views, console, $, define  */
 
 define([], function () {
-
-    'use strict';
-
+	
     return {
-        threshold: function (pixels) {
-            var threshold = 80,
-                d = pixels.data;
+        
+        darken: function (pixels) {
+            
+            var d = pixels.data,
+                r,
+                g,
+                b,
+                v;
+                
             for (var i = 0; i < d.length; i += 4) {
-                var r = d[i];
-                var g = d[i + 1];
-                var b = d[i + 2];
-                var v = (0.2126 * r + 0.7152 * g + 0.0722 * b >= threshold) ? 255 : 0;
+                d[i] -= 30
+                d[i + 1] -= 30
+                d[i + 2] -= 30
+            }
+            return pixels;
+        },
+        
+        grayscale: function (pixels) {
+            
+            var d = pixels.data,
+                r,
+                g,
+                b,
+                v;
+                
+            for (var i = 0; i < d.length; i += 4) {
+                r = d[i];
+                g = d[i + 1];
+                b = d[i + 2];
+                v = 0.2126 * r + 0.7152 * g + 0.0722 * b;
                 d[i] = d[i + 1] = d[i + 2] = v
             }
             return pixels;
         },
+        
+        overlight: function (pixels) {
+            
+            var d = pixels.data,
+                r,
+                g,
+                b,
+                v;
+                
+            for (var i = 0; i < d.length; i += 4) {
 
-        grayscale: function (pixels) {
-            var source = pixels.data,
-                data32 = new Uint32Array(source.buffer),
-                r = 0,
-                g = 0,
-                b = 0,
-                v = 0;
-
-            for (var y = 0; y < 360; ++y) {
-                for (var x = 0; x < 720; ++x) {
-                    var b = (data32[y * 720 + x] >> 16) & 0xff;
-                    var g = (data32[y * 720 + x] >> 8) & 0xff;
-                    var r = (data32[y * 720 + x] >> 0) & 0xff;
-
-                    var v = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-
-                    data32[y * 720 + x] =
-                        (255    << 24)   |
-                        (v      << 16)   |
-                        (v      <<  8)   |
-                         v;
-                }
+                r = d[i] + (d[i] > 1 ? 50 : 0);
+                g = d[i + 1] + (d[i + 1] > 1 ? 50 : 0);
+                b = d[i + 2];
+                v = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                d[i] = d[i + 1] = d[i + 2] = v > 255 ? 255 : v
             }
-
+            return pixels;
+        },
+        
+        underlight: function (pixels) {
+            
+            var d = pixels.data,
+                r,
+                g,
+                b,
+                v;
+                
+            for (var i = 0; i < d.length; i += 4) {
+                r = d[i] - 10;
+                g = d[i + 1] - 40;
+                b = d[i + 2];
+                v = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                d[i] = d[i + 1] = d[i + 2] = v
+            }
+            return pixels;
+        },
+        
+        sepia: function (pixels) {
+            
+            var d = pixels.data,
+                r,
+                g,
+                b,
+                v;
+                
+            for (var i = 0; i < d.length; i += 4) {
+  
+                r = d[i] - 20;
+                g = d[i + 1] - 20;
+                b = d[i + 2] - 20;
+                v = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+                d[i] = v + 40
+                d[i + 1] = v + 25
+                d[i + 2] = v
+            }
+            return pixels;
+        },
+        
+        hippie: function (pixels) {
+            
+            var d = pixels.data,
+                r,
+                g,
+                b,
+                v;
+                
+            for (var i = 0; i < d.length; i += 4) {
+                d[i] -= 10;
+                d[i + 1] -= 35;
+            }
+            return pixels;
+        },
+        
+        icequeen: function (pixels) {
+            
+            var d = pixels.data,
+                r,
+                g,
+                b,
+                v;
+                
+            for (var i = 0; i < d.length; i += 4) {
+                d[i] -= 5;
+                d[i + 1] -= 5;
+                d[i + 2] += 30;
+            }
             return pixels;
         },
 
-        hipster: function (pixels) {
-            var ar = App.R,
-                ag = App.G,
-                ab = App.B,
-                data32 = new Uint32Array(pixels.data.buffer), // use Uint32Array directly for faster manipulation
-                ii,
-                tt = data32.length,
-                b,
+
+//          hipster: function (pixels) {
+//             
+//             var ar = App.R,
+//                 ag = App.G,
+//                 ab = App.B,
+//                 data32 = new Uint32Array(pixels.data.buffer), // use Uint32Array directly for faster manipulation
+//                 ii,
+//                 tt = data32.length,
+//                 b,
+//                 g,
+//                 r;
+//         
+//             for (ii = 0; ii < tt; ii+=1) {
+//                 b = ((data32[ii] >> 16) & 0xff) * App.B;
+//                 g = ((data32[ii] >> 8) & 0xff) * App.G;
+//                 r = ((data32[ii] >> 0) & 0xff) * App.R;
+//         
+//                 // data32[ii] = (255 << 24) | 
+//                                 ((b > 255 ? 255 : b) << 16) | 
+//                                 ((g > 255 ? 255 : g) << 8) | 
+//                                 (r > 255 ? 255 : r);
+//             }
+//         
+//             return pixels;
+//         },
+
+        threshold: function (pixels) {
+            var threshold = 80,
+                d = pixels.data,
+                r,
                 g,
-                r;
-
-            for (ii = 0; ii < tt; ii+=1) {
-                b = ((data32[ii] >> 16) & 0xff) * App.B;
-                g = ((data32[ii] >> 8) & 0xff) * App.G;
-                r = ((data32[ii] >> 0) & 0xff) * App.R;
-
-                data32[ii] = (255 << 24) | ((b > 255 ? 255 : b) << 16) | ((g > 255 ? 255 : g) << 8) | (r > 255 ? 255 : r);
+                b,
+                v;
+                
+            for (var i = 0; i < d.length; i += 4) {
+                
+                r = d[i];
+                g = d[i + 1];
+                b = d[i + 2];
+                v = (0.2126 * r + 0.7152 * g + 0.0722 * b >= threshold) ? 255 : 0;
+                d[i] = d[i + 1] = d[i + 2] = v;
+                
             }
-
             return pixels;
         },
 
@@ -116,7 +221,5 @@ define([], function () {
             }
             return pixels;
         }
-
     };
-
 });

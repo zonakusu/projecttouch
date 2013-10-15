@@ -1,35 +1,34 @@
-/**
- * Microsoft Video Editor
- *
- * @namespace controllers
- * @name timeline
- * @author Thierry M.P. Kleist <thierry@codedazur.nl>
- * @date: 4/24/13
- */
-/*global views, console, $, $$, TweenLite, TweenMax, TimelineLite, TimelineMax, Ease, Linear, Power0, Power1, Power2, Power3, Power4, Quad, Cubic, Quart, Strong, Back, Bounce, Circ, Elastic, Expo, Sine, SlowMo  */
+/* Microsoft Video Editor
+ * @author: T.M.P. Kleist / Code D'azur <thierry@codedazur.nl>
+ * ============================================================================== */
 
-define(['backbone', 'underscore'], function (Backbone, _) {
+/*global views, console, $, define  */
+
+define(['app/collections/timeline', 'app/filters'], function (Collection, Filter) {
 
     'use strict';
 
-    var Timeline = function (collection) {
-
-        this.initialize(collection);
-
+    var Timeline = function () {
+        this.initialize();
     };
 
     Timeline.prototype = {
 
-        totalTime: 1000,
-        seek: 0,
+        _frame: 0,
         playing: false,
 
-        initialize: function (collection) {
+        initialize: function () {
 
             this.layers = [];
             this.videos = [];
             this.filter = null;
-            this.collection = collection;
+            this.collection = new Collection();
+
+            this.collection.on('trim:start', function (model) {
+                window.App.player.setSource([model]);
+            }, this);
+
+            this.collection.on('change:trim', this.seek, this);
 
             _.bindAll(this, 'addEventListeners', 'changeFilter', 'play', 'stop', 'frame');
 
@@ -37,28 +36,23 @@ define(['backbone', 'underscore'], function (Backbone, _) {
         },
 
         addEventListeners: function () {
-
-            //   this.collection.initTime();
-            this.collection.on('play', this.play);
-            this.collection.on('stop', this.stop);
-            //  App.Views.interface.effects.on('change', this.changeFilter);
-
+            document.querySelector('header').addEventListener('click', this.play);
         },
 
         changeFilter: function (filter) {
 
             switch (filter) {
-            case 'gray':
-                this.filter = Filters.grayscale;
-                break;
-            case 'thres':
-                this.filter = Filters.threshold;
-                break;
-            case 'pixel':
-                this.filter = Filters.pixelize;
-                break;
-            default:
-                this.filter = null;
+                case 'gray':
+                    this.filter = Filters.grayscale;
+                    break;
+                case 'thres':
+                    this.filter = Filters.threshold;
+                    break;
+                case 'pixel':
+                    this.filter = Filters.pixelize;
+                    break;
+                default:
+                    this.filter = null;
             }
 
         },
@@ -66,40 +60,64 @@ define(['backbone', 'underscore'], function (Backbone, _) {
         play: function () {
 
             if (this.playing) {
+                this.playing = false;
+
+                window.clearInterval(this.timer);
+                this.collection.trigger('pause');
+                
+                this.trigger('pause', 'pause');
+
                 return;
             }
 
+            this.trigger('play', 'play');
             this.playing = true;
             this.timer = window.setInterval(this.frame, 40);
 
         },
 
-        /*
-         * Syncs all the layers and sends the current layer to the Player API
-         */
+
+        /* Scrubs/Seek to frame 
+         * ---------------------------------------------------------------------- */
+
+        seek: function (frame) {
+            if (this.playing) {
+                this.stop();
+            }
+            this._frame = !isNaN(frame) ? frame : this._frame;
+            this.collection.trigger('seek', this._frame, this.collection.totalFrames);
+            window.App.player.setSource(this.collection.getActive());
+            window.App.filter = window.App.timeline.collection.getFilter(this._frame);
+        },
+
+
+        /* Syncs all the layers and sends the current layer to the Player API
+         * ---------------------------------------------------------------------- */
 
         frame: function () {
 
-            this.collection.trigger('frame-sync', this.seek);
+            this.collection.trigger('frame-sync', this._frame, this.collection.totalFrames);
             window.App.player.setSource(this.collection.getActive());
+            //window.App.player.setSource([this.collection.models[0], this.collection.models[1]]);
 
-            if (this.seek === this.totalTime) {
-                this.stopTimeline();
+            if (this._frame === this.collection.totalFrames) {
+                this.stop();
             } else {
-                this.seek += 1;
+                this._frame += 1;
             }
-
+            window.App.filter = window.App.timeline.collection.getFilter(this._frame);
         },
 
         stop: function () {
 
             this.playing = false;
+            this.trigger('stop', 'stop');
 
             window.clearInterval(this.timer);
             window.App.player.setSource();
 
-            this.seek = 0;
-            this.collection.trigger('kill');
+            this._frame = 0;
+            this.collection.trigger('kill', 0);
 
         }
 

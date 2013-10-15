@@ -1,0 +1,80 @@
+#library
+  //display: none
+  .file-selector
+    width: $panelWidth
+    +imageBefore($interface-sprite, $interface-sprite2x, button-add, 47, 110)
+
+    form
+      cursor: pointer
+      +opacity(0)
+      width: $panelWidth
+      height: 100%
+      overflow: hidden
+
+    input
+      +opacity(0)
+      width: $panelWidth * 2
+      height: 100%
+      position: absolute
+      right: 0
+      &::-ms-browse
+        width: 300px
+
+    label
+      cursor: pointer
+      opacity: 0
+      width: 280px
+      height: 100%
+      position: absolute
+      display: block
+      top: 0
+
+    &:hover
+      background-color: $titleBlue
+
+  .library-item
+    width: $panelWidth
+    height: $libraryItemHeight
+    background: rgba(0, 0, 0, 0.5) no-repeat center center
+    background-size: cover
+
+    > *
+      position: absolute
+
+    h3
+      background: rgba(0, 0, 0, 0.5)
+      width: 100%
+      padding: 5px
+      line-height: 1.5em
+      text-indent: 5px
+
+    button
+      color: black
+      height: 34px
+      width: 34px
+      bottom: 10px
+      right: 10px
+      position: absolute
+      +imageAfter($interface-sprite, $interface-sprite2x, button-zoom-in, 8, 8)
+      +hide-text()
+
+    img, video
+      width: 100%
+      height: auto
+
+    &:hover
+      h3
+        opacity: 1
+
+    &.audio
+      height: 95px
+
+      +imageAfter($interface-sprite, $interface-sprite2x, icon-sound, 16, 16)
+
+      &:after
+        background-color: white
+      h3
+        opacity: 1
+        padding: 5px 50px 5px 5px
+        background: none
+

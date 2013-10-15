@@ -1,12 +1,10 @@
-/**
- * Project Touch
- *
- * @date: 6/18/13
- */
+/* Microsoft Video Editor
+ * @author: T.M.P. Kleist / Code D'azur <thierry@codedazur.nl>
+ * ============================================================================== */
 
-/*global define, window, document, $, requirejs, require  */
+/*global views, console, $, define  */
 
-define(['backbone', 'underscore'], function (Backbone, _) {
+define([], function () {
 
     'use strict';
 
@@ -28,30 +26,54 @@ define(['backbone', 'underscore'], function (Backbone, _) {
             this.source = null;
             this.effect = false;
 
-            this.width = 1280;
-            this.height = 720;
+            this.width = 640;
+            this.height = 360;
+
+        },
+        
+        
+        render: function () {
+
+            this.effectCanvas = document.createElement('canvas');
+            this.effectContext = this.effectCanvas.getContext('2d');
+            this.effectCanvas.width = this.width;
+            this.effectCanvas.height = this.height;
+
+            this.el.setAttribute('id', 'player');
+            this.el.width = this.width;
+            this.el.height = this.height;
+
+            this.context = this.el.getContext('2d');
+            this.renderLoop();
+            this.el.addEventListener('click', this.toggleEffect, false);
+
+            return this;
 
         },
 
+        
+        /* Sets the source of the player
+         * ---------------------------------------------------------------------- */
+        
         setSource: function (model) {
 
             if (model !== undefined && model !== null) {
-                this.source = model.video;
+                this.source = model;
             } else {
                 this.source = null;
                 this.context.clearRect(0, 0, this.width, this.height);
             }
 
         },
-        
-        setEffect: function (effect) {
-            
-        },
-        
-        setOverLay: function (overlay) {
-            
-        },
 
+
+        setEffect: function (effect) { },
+        setOverLay: function (overlay) { },
+
+
+        /* Filters an image with a specific filter
+         * ---------------------------------------------------------------------- */
+        
         filterImage: function (filter, data, var_args) {
             var args = [data];
 
@@ -61,63 +83,61 @@ define(['backbone', 'underscore'], function (Backbone, _) {
 
             return filter.apply(App, args);
         },
+        
 
-        render: function () {
-
-            this.effectCanvas = document.createElement('canvas');
-            this.effectContext = this.effectCanvas.getContext('2d');
-
-            this.effectCanvas.width = this.width;
-            this.effectCanvas.height = this.height;
-
-            this.el.setAttribute('id', 'player');
-
-            this.el.width = this.width;
-            this.el.height = this.height;
-
-            this.context = this.el.getContext('2d');
-
-            this.renderLoop();
-
-            this.el.addEventListener('click', this.toggleEffect, false);
-
-            this.el.style.position = "absolute";
-            this.el.style.top = "50%";
-            this.el.style.left = "50%";
-            this.el.style.margin = '-' + (this.height / 2) + 'px 0 0 -' + (this.width / 2) + 'px';
-
-            return this;
-
-        },
-
+        /* toggles the effect
+         * ---------------------------------------------------------------------- */
+        
         toggleEffect: function () {
             this.effect = this.effect === false;
+            
         },
+        
+        
+        /* The function that's being triggered every frame per video
+         * ---------------------------------------------------------------------- */
+        
+        rendering: function (source, opacity) {
+            var width,
+                height,
+                posX,
+                posY;
+            if (source !== undefined && source.video !== undefined) {
+                width = source.video.videoWidth * source.get('scale');
+                height = source.video.videoHeight * source.get('scale');
 
+                posX = -(width / 2);
+                posY = -(height / 2);
+
+                this.context.save();
+                this.context.globalAlpha = this.source.length > 1 ? 1 / this.source.length : 1;
+                this.context.translate(this.width / 2, this.height / 2);
+                this.context.rotate(source.get('rotation') * Math.PI / 180);
+                this.context.drawImage(source.video, 0, 0, source.video.videoWidth, source.video.videoHeight, posX, posY, width, height);
+                this.context.restore();
+            }
+        },
+        
+
+        /* The render loop that's being triggered every frame
+         * ---------------------------------------------------------------------- */
+        
         renderLoop: function () {
 
             if (this.source !== null && this.source !== undefined) {
 
                 var width,
-                height,
-                posX,
-                posY;
+                    height,
+                    posX,
+                    posY;
 
-                width = this.width;
-                height = this.height;
-                posX = 0;
-                posY = 0;
-
-                if (window.App.filter !== null) {
-
-                    var pixelData;
-
-                    this.effectContext.drawImage(this.source, 0, 0, this.source.videoWidth, this.source.videoHeight, posX, posY, width, height);
-                    pixelData = this.filterImage(App.filter, this.effectContext.getImageData(0, 0, this.width, this.height));
-                    this.context.putImageData(pixelData, 0, 0);
-
+                if (this.source.length > 1) {
+                    _.each(this.source, this.rendering, this);
                 } else {
-                    this.context.drawImage(this.source, 0, 0, this.source.videoWidth, this.source.videoHeight, posX, posY, width, height);
+                    this.rendering(this.source[0]);
+                }
+                if (window.App.filter !== null) {
+                    this.context.putImageData(this.filterImage(App.filter, this.context.getImageData(0, 0, this.width, this.height)), 0, 0);
                 }
 
             }

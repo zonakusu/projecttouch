@@ -1,0 +1,63 @@
+/* WEBKIT
+ * ---------------------------------------------------------------------- */
+
+::-webkit-scrollbar
+  width: 10px
+  height: 6px
+
+::-webkit-scrollbar-button
+  background-color: #666
+
+::-webkit-scrollbar-track
+  background-color: #999
+
+::-webkit-scrollbar-track-piece
+  background-color: #666
+
+::-webkit-scrollbar-thumb
+  height: 50px
+  background-color: $titleBlue
+  border-radius: 3px
+
+::-webkit-scrollbar-corner
+  background-color: #999
+
+::-webkit-resizer
+  background-color: #666 
+
+/* IE
+ * ---------------------------------------------------------------------- */
+  
+body
+  scrollbar-base-color: $titleBlue
+  scrollbar-3dlight-color: #666
+  scrollbar-highlight-color: #666
+  scrollbar-track-color: #666
+  scrollbar-arrow-color: #666
+  scrollbar-shadow-color: #666
+  scrollbar-dark-shadow-color: #1D1D1D
+
+/* MOZ
+ * ---------------------------------------------------------------------- */
+
+@-moz-document url-prefix(http://),url-prefix(https://)
+  scrollbar
+    -moz-appearance: none !important
+    background: rgb(255, 255, 0) !important
+  thumb, scrollbarbutton
+    -moz-appearance: none !important
+    background-color: $titleBlue !important
+  thumb:hover
+    -moz-appearance: none !important
+    background-color: rgb(255, 0, 0) !important
+  scrollbarbutton
+    &:hover
+      -moz-appearance: none !important
+      background-color: rgb(255, 0, 0) !important
+    display: none !important
+  scrollbar[orient="vertical"]
+    min-width: 10px !important
+
+
+
+ 

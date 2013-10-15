@@ -2,65 +2,103 @@
 <html>
 <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 	<title>Project Touch</title>
-	<link rel="stylesheet" type="text/css" href="stylesheet.css">
+	<link rel="stylesheet" type="text/css" href="styles/stylesheet.css">
 	<script src="libs/require-2.1.6.min.js" data-main="application"></script>
 </head>
 <body>
 	<header>
-
+        <h1>Project Touch</h1>
 	</header>
 
 	<div class="video">
-		<button class="play"></button>
-		<button class="stop"></button>
+
+        <section id="library" class="ui-panel left">
+          <h2>My Content</h2>
+            <ul>
+            <li class="file-selector">
+              <form>
+                <input type="file" name="file-upload" id="fileinput" accept="video/mp4|audio/mp3video/avi|video/ovg[]][[]][[]]" multiple>
+                <label for="fileinput" id="link" class="trigger-file-input">Browse</label>
+              </form>
+            </li>
+          </ul>
+        </section>
+
+        <section id="edit" class="ui-panel left">
+            <h2>Edit Video</h2>
+            <button id="btnCloseEdit">&laquo; back</button>
+
+            <h3>Scale</h3>
+
+            <div class="level" id="level-scale">
+                <div class="holder" style="padding-right: 235px" >
+                    <div class="middle" ></div>
+                </div>
+                <div class="right"></div>
+            </div>
+            <h3>Rotation</h3>
+
+            <div class="level" id="level-rotation">
+                <div class="holder" style="padding-right: 235px">
+                    <div class="middle" ></div>
+                </div>
+                <div class="right"></div>
+            </div>
+            <h3>Audio level</h3>
+
+            <div class="level" id="level-volume">
+                <div class="holder" style="padding-right: 235px">
+                    <div class="middle" ></div>
+                </div>
+                <div class="right"></div>
+            </div>
+        </section>
+
+
+
+        <section id="composition">
+            <h2>My Composition</h2>
+            <!--Will contain player.js canvas -->
+
+        </section>
+
+        <section id="effects" class="ui-panel right"><h2>My Effects</h2><ul></ul></section>
+
 	</div>
 
 	<footer>
-		<div class="bar">
-			Timeline
-			<div class="line">00:00<span>01:23</span></div>
-		</div>
-		<div class="bar effects">
-			SFX
-			<div class="line">
-				<div class="part" style="left: 20%; width: 10%;"></div>
-			</div>
-		</div>
-		<div class="bar">
-			Video #1
-			<div class="line">
-				<div class="part" style="left: 10%; width: 50%;"></div>
-			</div>
-		</div>
-		<div class="bar">
-			Video #1
-			<div class="line">
-				<div class="part" style="left: 80%; width: 20%;"></div>
-			</div>
-		</div>
-		<div class="bar">
-			Video #1
-			<div class="line">
-				<div class="part" style="left: 44%; width: 15%;"></div>
-			</div>
-		</div>
-		<!--<button class="pixelize"></button>-->
-		<!--<button class="threshold"></button>-->
-		<!--<button class="grayscale"></button>-->
-		<!--<button class="red">r</button>-->
-		<!--<button class="green">g</button>-->
-		<!--<button class="contrast">b</button>-->
-		<!--<button class="hipster">H</button>-->
 
-		<!--<div id="rgb">-->
-			<!--<h1>Color adjustments</h1>-->
+    <div class="controls">
+        <button class="play" id='play-pause'></button>
+        <button class="stop"></button>
+    </div>
 
-			<!--R: <input type="range" min="-4" step="0.01" max="4" id="r" value="1"><br>-->
-			<!--G: <input type="range" min="-4" step="0.01" max="4" id="g" value="1"><br>-->
-			<!--B: <input type="range" min="-4" step="0.01" max="4" id="b" value="1"><br>-->
-			<!--C: <input type="range" min="-4" step="0.1" max="4" id="c" value="0"><br>-->
-		<!--</div>-->
+    <button class="zoom in"></button>
+    <button class="zoom out"></button>
+
+    <ol class="labels">
+    </ol>
+
+    <div class="layer-holder">
+      <ol id="layers" class="layers">
+        <li class="time">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </li>
+        <div id="scrubber"></div>
+      </ol>
+    </div>
+
 	</footer>
 </body>
 </html>

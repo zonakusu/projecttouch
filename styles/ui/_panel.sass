@@ -1,0 +1,33 @@
+.ui-panel
+
+  width: $panelWidth
+  position: absolute
+  top: 0
+  bottom: $headerHeight
+
+  &.left
+    left: $sideMargin
+
+  &.right
+    right: $sideMargin
+
+  ul
+    width: 100%
+    position: absolute
+    top: 50px
+    bottom: 0
+    overflow: hidden
+    overflow-y: auto
+
+    li
+      position: relative
+      width: 100%
+      height: $libraryItemHeight
+      margin: 10px 0 0
+
+      &:first-child
+        margin: 0
+
+
+
+ 

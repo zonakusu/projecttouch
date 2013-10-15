@@ -1,0 +1,274 @@
+$experimental-support-for-svg: true
+footer
+  background: #333333
+  min-height: 20%
+  position: absolute
+  bottom: 0
+  width: 100%
+  padding: 0 30px 30px
+  padding-bottom: 20px
+  color: #999999
+  font-size: 14px
+  z-index: 9999999
+  
+  h2
+    position: absolute
+    font-size: 20px
+    top: 9px
+  
+  .zoom
+    position: absolute
+    top: 13px
+    width: 34px
+    height: 34px
+   
+    &.in
+      left: 136px
+      +imageAfter($interface-sprite, $interface-sprite2x, button-zoom-in,8,8)
+    &.out
+      left: 160px
+      +imageAfter($interface-sprite, $interface-sprite2x, button-zoom-out,8,8)
+  
+  .controls
+    position: absolute
+    top: 21px 
+    left: 40px
+  
+  button
+    width: 20px
+    height: 30px  
+    position: relative
+
+    &.play
+      +imageAfter($interface-sprite, $interface-sprite2x, button-play, 0,0)
+  
+    &.stop
+      +imageAfter($interface-sprite, $interface-sprite2x, button-stop, 0,0)
+  
+    &.pause
+      +imageAfter($interface-sprite, $interface-sprite2x, button-pause, 0,0)
+  
+  
+  #scrubber 
+    position: absolute
+    height: 100%
+    z-index: 999
+    margin: 0 0 0 -25px
+    width: 50px
+    text-align: center
+    padding: 3px
+    color: white
+    top: 0
+    
+    cursor: -webkit-grab
+    #cursor: -webkit-grabbing
+    
+    &:after
+      content: ''
+      position: absolute
+      height: 100%
+      border: 1px solid #FFFFFF
+      top: 20px
+      left: 50%
+      
+  .labels
+    width: 170px
+    height: 50px
+    position: absolute
+    top: 50px
+    li
+      height: 20px
+      position: relative
+      margin-top: 10px
+      background: #2C2B2C
+      color: white
+      line-height: 20px
+      padding: 0 0 0 20px
+      
+      &>button
+        position: absolute
+        right: 5px
+        top: 0
+        width: 20px
+        height: 20px
+        +imageAfter($interface-sprite, $interface-sprite2x, button-menu-active, 5, 0)
+        
+      &>div
+        display: none
+        position: absolute
+        width: 50px
+        height: 20px
+        z-index: 9999
+        top: 0
+        right: -50px
+        background: #2C2B2C
+        
+        button
+          display: inline-block
+          width: 20px
+          height: 20px
+          position: relative 
+          
+          &.delete
+            +imageAfter($interface-sprite, $interface-sprite2x, button-delete, 3, 0)
+        
+          &.duplicate
+            +imageAfter($interface-sprite, $interface-sprite2x, button-duplicate, 3, 0)
+      
+      &.active>div
+        display: block
+        
+      
+      &:first-child
+        margin: 0
+    
+  .layers
+    position: relative
+    width: 100%
+  
+  .layer-holder
+    position: relative
+    margin: 0 0 0 170px
+    padding: 20px 0 0
+    overflow: hidden
+
+    
+    ol
+      li
+        background-color: #2d2c2d
+        height: 20px
+        position: relative 
+        margin-top: 10px
+      
+        &:first-child
+          font-size: 0
+          margin-top: 0px
+          cursor: move
+        
+          span
+            width: 10%
+            display: inline-block
+            height: 100%
+            border-left: 1px solid #424142
+            position: relative
+            color: #858585
+            +background( linear-gradient(left, #2C2B2D, #2A282A) )
+          
+            &:first-child
+              border: 0
+            
+            div
+              position: absolute
+              font-size: 12px
+              top: -15px
+              left: -16px
+          
+    
+  .layer
+    position: absolute
+    right: 0
+    top: 0
+    left: 0
+    height: 100%
+    font-size: 11px
+    height: 20px
+    background: #282628
+    overflow: hidden
+    
+    &>button
+      position: absolute
+      left: 0
+      width: 20px
+      height: 20px
+      background: white
+    &.effect
+      .media
+        .middle
+          +background(linear-gradient(top, #4cffa7, #3dcd87))
+          
+    &.audio
+      .media
+        .middle
+          +background(linear-gradient(top, #EEEEEE, #C1C1C1))
+    
+    .media
+      position: absolute
+      height: 100%
+      cursor: move
+      overflow: hidden
+      
+      +background( linear-gradient(top, #1F1F1F, #191919) )
+
+
+      .left
+        -ms-touch-action: none
+        display: block
+        position: absolute
+        left: 0
+        top: 0
+        height: 26px
+        width: 26px
+        cursor: e-resize
+        z-index: 99
+        +imageBefore($interface-sprite, $interface-sprite2x, drag-left, 2, 2)
+        
+      .middle
+        -ms-touch-action: none
+        display: block
+        position: relative
+        height: 26px
+        width: 100%
+        z-index: 80
+        +background( linear-gradient(top, #199DCA, #127EA2) )
+
+        
+      .right
+        -ms-touch-action: none
+        display: block
+        position: absolute
+        right: 0
+        top: 0
+        height: 26px
+        width: 26px 
+        cursor: w-resize
+        z-index: 99
+        +imageAfter($interface-sprite, $interface-sprite2x, drag-right, 2, 2)
+        
+        
+      &.selected
+        // +background( linear-gradient(top, darken(#191919, 15), darken(#1F1F1F, 15)) )
+        
+        .middle
+          +background( linear-gradient(top, darken(#127EA2, 15), darken(#199DCA, 15)) )
+        
+  .layer span
+    float: right
+    margin-right: 6px
+    
+  .layer .part
+    position: absolute
+    height: 100%
+    +background( linear-gradient(top, #199DCA, #127EA2) )
+
+
+footer .part .left, footer .part .right
+  position: absolute
+  width: 40px
+  height: 40px
+  background: rgba(255, 255, 255, 0.3)
+  top: -10px
+
+footer .part .left
+  left: -10px
+
+footer .part .right
+  right: -10px
+
+footer .layer .part
+  background: -moz-layerar-gradient(top, #4cffa7 0%, #36d486 100%)
+  background: -webkit-gradient(layerar, left top, left bottom, color-stop(0%, #4cffa7), color-stop(100%, #36d486))
+  background: -webkit-layerar-gradient(top, #4cffa7 0%, #36d486 100%)
+  background: -o-layerar-gradient(top, #4cffa7 0%, #36d486 100%)
+  background: -ms-layerar-gradient(top, #4cffa7 0%, #36d486 100%)
+  background: layerar-gradient(to bottom, #4cffa7 0%, #36d486 100%)
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#4cffa7', endColorstr='#36d486',GradientType=0 )

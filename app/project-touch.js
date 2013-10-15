@@ -1,156 +1,85 @@
-/**
- * Project Touch
- *
- * @date: 6/18/13
- */
+/* Microsoft Video Editor
+ * @author: T.M.P. Kleist / Code D'azur <thierry@codedazur.nl>
+ * ============================================================================== */
 
-/*global define, window, document, $, requirejs, require, console  */
+/*global views, console, $, define  */
 
-define(['backbone', 'app/views/player', 'app/filters', 'app/collections/library', 'app/collections/timeline', 'app/controllers/timeline', 'app/models/media', 'app/views/library/list'], function (Backbone, Player, Filters, Library, Timeline, TimelineController, Media, LibView) {
+Number.prototype.toMMSS = function () {
+    var sec_num = parseInt(this, 10); // don't forget the second parm
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    var time    = minutes+':'+seconds;
+    return time;
+}
+
+define(['app/views/player', 
+        'app/filters',
+        'app/utils', 
+        'app/views/ui/library', 
+        'app/views/ui/effects', 
+        'app/views/ui/edit', 
+        'app/controllers/timeline', 
+        'app/views/ui/timeline', 
+        'app/views/composition'], function () {
 
     'use strict';
 
     return Backbone.View.extend({
 
         filter: null,
-        debug: true,
-
-        events: {
-            "click button": "handler"
-        },
-
-        R: 1,
-        G: 1,
-        B: 1,
-        Sat: 100,
-        C: 0,
 
         initialize: function () {
+            
+            var self = this,
+                Timeline = require('app/controllers/timeline'),
+                Player = require('app/views/player'),
+                Filter = require('app/filters'),
+                Utils = require('app/utils'),
+                Composition = require('app/views/composition');
 
-            var self = this;
-
-            window.log = function () {
-                if (self.debug) {
-                    console.log.apply(console, arguments);
-                }
-            }
-
-            this.library = new Library();
+            this.views = {};
             this.player = new Player();
             this.timeline = new Timeline();
-            this.timelineController = new TimelineController(this.timeline);
+            this.composition = new Composition();
+            this.utils = Utils;
+            
+            this.R = 1;
+            this.G = 1;
+            this.B = 1.3;
 
-            this.library.on('add', function (model) {
-                log('model', this.library.models.length, model)
-            }, this);
-
-            //setInterval(this.getRGB, 600);
         },
 
         render: function () {
+            var Library = require('app/views/ui/library'),
+                Effects = require('app/views/ui/effects'),
+                Edit = require('app/views/ui/edit'),
+                Timeline = require('app/views/ui/timeline');
 
-            _.bindAll(this, 'handleFileSelect');
+            this.views.library = new Library({
+                position: 'left'
+            });
+            
+            this.views.timeline = new Timeline();
+            
+            this.views.edit = new Edit({
+                position: 'left',
+                collection: this.views.timeline.collection
+            });
 
-            this.el.appendChild(this.player.render()
-                .el);
+            this.views.effects = new Effects({
+                position: 'right',
+                collection: this.views.timeline.collection
+            });
+            
+            
+            this.composition.el.appendChild(this.player.render().el);
+            $('#player').height($('#player').width() / 1.7778);
 
-            this.form = document.createElement('form');
-            this.input = document.createElement('input');
-            this.input.setAttribute('type', 'file');
-            this.input.setAttribute('name', 'file-upload');
-            this.input.setAttribute('style', 'position: absolute; display: block; height: 10%; width: 10%;');
-
-            this.form.appendChild(this.input);
-            this.el.insertBefore(this.form, this.el.firstChild);
-
-            this.el.addEventListener('dragenter', this.dragEscape, false);
-            this.el.addEventListener('dragexit', this.dragEscape, false);
-
-            this.el.addEventListener('dragover', this.handleDragOver, false);
-            this.el.addEventListener('drop', this.handleFileSelect, false);
-
-            this.input.addEventListener('change', this.handleFileSelect, false);
-
-            this.libView = new LibView();
-            this.el.appendChild(this.libView.render()
-                .el);
-            this.library.on('add', this.libView.add);
-
-        },
-
-        handleFileSelect: function (evt) {
-
-            var files;
-
-            if (evt.type === 'change') {
-                files = evt.target.files;
-            } else {
-                files = evt.dataTransfer.files;
-                evt.preventDefault();
-                evt.stopPropagation();
-            }
-
-            _.each(files, function (file) {
-
-                if (file.type !== "video/mp4") {
-                    console.warn('file must be mp4');
-                } else {
-                    this.library.add(new Media({
-                        file: file
-                    }));
-                }
-            }, this);
-
-        },
-
-        handler: function (e) {
-
-            var className = e.currentTarget.getAttribute('class');
-
-            switch (className) {
-            case "play":
-                this.timelineController.play();
-                e.currentTarget.setAttribute('class', 'pause');
-                break;
-            case "pause":
-
-                e.currentTarget.setAttribute('class', 'play');
-                break;
-            case "stop":
-                if (document.querySelector('.pause')) {
-                    this.timelineController.stop();
-                    document.querySelector('.pause')
-                        .setAttribute('class', 'play');
-                }
-                break;
-
-            case "grayscale":
-            case "threshold":
-            case "pixelize":
-            case "red":
-            case "green":
-            case "contrast":
-            case "hipster":
-                if (this.filter === Filters[className]) {
-                    console.log('disabling filter', className);
-                    this.filter = null;
-                } else {
-                    console.log('enabling filter', className);
-                    this.filter = Filters[className];
-                }
-                break;
-
-            }
-        },
-
-        getRGB: function () {
-
-            (Math.floor(Math.random() * 11)) / 10
-
-            App.R = 0;//(Math.floor(Math.random() * 11)) / 10;
-            App.G = 0;//(Math.floor(Math.random() * 11)) / 10;
-            App.B = 0;//(Math.floor(Math.random() * 11)) / 10;
-            App.C = 0;//(parseFloat(document.getElementById('c').value));
         }
 
     });

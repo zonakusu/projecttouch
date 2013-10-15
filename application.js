@@ -1,10 +1,8 @@
-/**
- * Project Touch
- *
- * @date: 6/18/13
- */
+/* Microsoft Video Editor
+ * @author: T.M.P. Kleist / Code D'azur <thierry@codedazur.nl>
+ * ============================================================================== */
 
-/*global define, window, document, $, requirejs, require  */
+/*global views, console, $, define  */
 
 requirejs.config({
     waitSeconds: 1,
@@ -25,24 +23,29 @@ requirejs.config({
             exports: "Backbone"
         },
         "stats": {
-          exports: "Stats"  
+            exports: "Stats"
+        },
+        "jquery-ui": {
+            exports: "$",
+            deps: ['jquery']
         }
     }
 });
 
-require(['app/project-touch', 'hammer', 'stats'], function (PT) {
+//Enforce loading global libraries first
+require(['backbone', 'underscore', 'hammer', 'stats'], function (PT) {
 
-    'use strict';
-    
-//    var stats = new Stats();
-//
-//    stats.domElement.style.position = 'absolute';
-//    stats.domElement.style.left = '0px';
-//    stats.domElement.style.bottom = '0px';
-//
-//    document.body.appendChild( stats.domElement );
+    require(['app/project-touch'], function (PT) {
 
-    window.App = new PT({el: document.querySelector('.video')});
-    window.App.render();
+        'use strict';
+
+        window.log = Function.prototype.bind.call(console.log, console);
+
+        window.App = new PT({
+            el: document.querySelector('.video')
+        });
+        window.App.render();
+
+    });
 
 });
